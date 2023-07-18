@@ -125,15 +125,15 @@ async function main(){
         // which address begin to deposit and borrow 
         console.log(`wallet address: ${wallet.address} begin to deposit ${ethers.utils.formatEther(deposit_amount)}  \n`);
         const deposit_tx =await eraLend_deposit(deposit_amount,wallet);
-        console.log(`执行成功 https://explorer.zksync.io/tx/${deposit_tx}} \n`);
+        console.log(`执行成功 https://explorer.zksync.io/tx/${deposit_tx} \n`);
         await sleep(2);
         console.log(`wallet address: ${wallet.address} begin to enter market \n`);
         const enterMarket_tx =await eralend_enterMarkets(wallet);
-        console.log(`执行成功 https://explorer.zksync.io/tx/${enterMarket_tx}} \n`);
+        console.log(`执行成功 https://explorer.zksync.io/tx/${enterMarket_tx} \n`);
         await sleep(2);
         console.log(`wallet address: ${wallet.address} begin to  borrow ${ethers.utils.formatEther(borrow_amount)} \n`);
         const borrow_tx =await eralend_borrow(borrow_amount,wallet);
-        console.log(`执行成功 https://explorer.zksync.io/tx/${borrow_tx}} \n`);
+        console.log(`执行成功 https://explorer.zksync.io/tx/${borrow_tx} \n`);
         await sleep(2);
 
 
