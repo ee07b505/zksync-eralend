@@ -118,9 +118,8 @@ async function eralend_borrow(borrowAmount,wallet) {
 async function main(){
 
     wallet_privatekeys.forEach(async function(privatekey){
-        try {
-
         const wallet = new zksync.Wallet(privatekey, zk_provier);
+        try {
         const deposit_amount = ethers.utils.parseEther("0.03");
         const borrow_amount = ethers.utils.parseEther("0.017");
         // which address begin to deposit and borrow 
