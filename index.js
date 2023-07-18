@@ -123,7 +123,7 @@ async function main(){
         const deposit_amount = ethers.utils.parseEther("0.03");
         const borrow_amount = ethers.utils.parseEther("0.017");
         // which address begin to deposit and borrow 
-        console.log(`wallet address: ${wallet.address} begin to deposit ${ethers.utils.format(deposit_amount)}  \n`);
+        console.log(`wallet address: ${wallet.address} begin to deposit ${ethers.utils.formatEther(deposit_amount)}  \n`);
         const deposit_tx =await eraLend_deposit(deposit_amount,wallet);
         console.log(`执行成功 https://explorer.zksync.io/tx/${deposit_tx}} \n`);
         await sleep(2);
@@ -131,7 +131,7 @@ async function main(){
         const enterMarket_tx =await eralend_enterMarkets(wallet);
         console.log(`执行成功 https://explorer.zksync.io/tx/${enterMarket_tx}} \n`);
         await sleep(2);
-        console.log(`wallet address: ${wallet.address} begin to  borrow ${ethers.utils.format(borrow_amount)} \n`);
+        console.log(`wallet address: ${wallet.address} begin to  borrow ${ethers.utils.formatEther(borrow_amount)} \n`);
         const borrow_tx =await eralend_borrow(borrow_amount,wallet);
         console.log(`执行成功 https://explorer.zksync.io/tx/${borrow_tx}} \n`);
         await sleep(2);
