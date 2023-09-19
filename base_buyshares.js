@@ -119,8 +119,8 @@ async function bot_killer(){
     let toWallet= await generate_NEW_Wallet();
     await transfer_All_ETH_to_other_wallet(sniperWallet,toWallet);
     await buyShares(sniperWallet,sniperWallet.address, 1);
-    await sleep(15);
-    // await sellShares(sniperWallet,sniperWallet.address, 1);
+    await sleep(2);
+    await sellShares(sniperWallet,sniperWallet.address, 1);
 
 
 }
