@@ -1,2 +1,4 @@
 /node_modules
 /private.txt
+/private*
+.env
