@@ -51,7 +51,7 @@ async function chechMainnetGasPrice() {
     const eth_gasPrice = await eth_provider.getGasPrice()
     console.log("eth_gasPrice is", ethers.utils.formatUnits(eth_gasPrice.toString(),"gwei").toString())
     // if gasPrice smaller than 10 gwei, return true
-    if (eth_gasPrice < 10000000000n) {
+    if (eth_gasPrice < 12000000000n) {
         return false;
     }
     else {
@@ -147,10 +147,10 @@ async function transfer_ETH_to_other_wallet(from,to,amount) {
     const base_provider = provider
     const base_gasPrice =  await base_provider.getGasPrice()
     console.log("base_gasPrice is", ethers.utils.formatUnits(base_gasPrice.toString(),"gwei").toString())
-    const eth_gas = ethers.utils.parseUnits('0.11', 'gwei');
+    const eth_gas = gasPrice;
     const gas_estimate = 21000
     console.log("gas estimate is", gas_estimate.toString())
-    const gas_fee = ethers.utils.parseEther("0.000022")
+    const gas_fee = ethers.utils.parseEther("0.00003")
     //const gas_fee = ethers.BigNumber.from(eth_gas.toString()).mul(gas_estimate);
     console.log("gas fee is", ethers.utils.formatEther(gas_fee.toString()).toString())
     const fromWallet = from.connect(provider);
