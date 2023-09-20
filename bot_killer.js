@@ -11,7 +11,7 @@ const wallet_privatekeys = pdata_array.filter(Boolean)
 const contractAddress = '0xCF205808Ed36593aa40a44F10c7f7C2F67d4A4d4';
 const contractABI = JSON.parse(fs.readFileSync('contractABI.json', 'utf8'));
 const contract = new ethers.Contract(contractAddress, contractABI, provider);
-const gasPrice = ethers.utils.parseUnits('0.109362757', 'gwei');
+let  gasPrice ;
 const BUY_PRICE_LIMIT = 5000000000000000n; // in wei 
 
 //   If no wallet found in wallet_privatekeys , use specified private key  
@@ -21,6 +21,7 @@ const BUY_PRICE_LIMIT = 5000000000000000n; // in wei
 (async () => {
 let lastPrivateKey;
 let beginWallet;
+gasPrice =await provider.getGasPrice();
 for (let i = wallet_privatekeys.length-1; i >=0; i--) {
     const privateKey = JSON.parse(wallet_privatekeys[i]).privateKey 
     console.log("Checking address balance")
@@ -83,7 +84,7 @@ async function checkBalance(privateKey) {
     const address = wallet.address;
     const data = {address,privateKey:privateKeyNEW };
     const data_json = JSON.stringify(data);
-    fs.appendFileSync('private.txt', data_json + "\n");  
+    fs.appendFileSync(privateFile, data_json + "\n");  
     return new ethers.Wallet(privateKeyNEW, provider);
  }
 
@@ -103,7 +104,7 @@ async function buyShares(wallet,subjectAddress, sharesToBuy) {
     }
 
     try {
-        const tx = await contractWithSigner.buyShares(subjectAddress, qty, { value: buyPrice, gasPrice });
+        const tx = await contractWithSigner.buyShares(subjectAddress, qty, { value: buyPrice,gasPrice });
         const receipt = await tx.wait();
         console.log(`https://basescan.org/tx/${receipt.transactionHash}` );
 
@@ -129,7 +130,7 @@ async function sellShares(wallet,subjectAddress, sharesToSell) {
     }
 
     try {
-        const tx = await contractWithSigner.sellShares(subjectAddress, qty, { gasPrice,value:0 });
+        const tx = await contractWithSigner.sellShares(subjectAddress, qty, {gasPrice, value:0 });
         const receipt = await tx.wait();
         console.log(`https://basescan.org/tx/${receipt.transactionHash}` );
         const balance = await wallet.getBalance();
@@ -148,10 +149,10 @@ async function transfer_ETH_to_other_wallet(from,to,amount) {
     const base_gasPrice =  await base_provider.getGasPrice()
     console.log("base_gasPrice is", ethers.utils.formatUnits(base_gasPrice.toString(),"gwei").toString())
     const eth_gas = gasPrice;
-    const gas_estimate = 21000
+    const gas_estimate = 100000;
     console.log("gas estimate is", gas_estimate.toString())
-    const gas_fee = ethers.utils.parseEther("0.00003")
-    //const gas_fee = ethers.BigNumber.from(eth_gas.toString()).mul(gas_estimate);
+    const gas_fee_line = ethers.utils.parseEther("0.00003")
+    const gas_fee = ethers.BigNumber.from(base_gasPrice.toString()).mul(gas_estimate).mul(12).div(10).gt(gas_fee_line)?ethers.BigNumber.from(base_gasPrice.toString()).mul(gas_estimate).mul(12).div(10):gas_fee_line
     console.log("gas fee is", ethers.utils.formatEther(gas_fee.toString()).toString())
     const fromWallet = from.connect(provider);
     const toWallet= to.connect(provider);
@@ -163,14 +164,14 @@ async function transfer_ETH_to_other_wallet(from,to,amount) {
         to: toWallet.address,
         value: balance.sub(gas_fee),
         gasLimit: gas_estimate,
-        gasPrice: eth_gas
+        gasPrice
     };}
     if(amount > 0){
          tx = {
             to: toWallet.address,
             value: ethers.utils.parseEther(amount.toString()),
             gasLimit: gas_estimate,
-            gasPrice: eth_gas
+            gasPrice
         };
     }
     const txResponse = await fromWallet.sendTransaction(tx);
@@ -186,6 +187,18 @@ async function transfer_ETH_to_other_wallet(from,to,amount) {
 
     return fromWallet;
     } catch (err) {
+        //delete the new private key if transfer failed, SyntaxError: Unexpected end of JSON input
+        const data = fs.readFileSync(privateFile, 'utf8');
+        const data_array = data.split("\n");
+        const data_array_new = data_array.filter(function (el) {
+            //return JSON.parse(el).address != to.address;
+            const walletObject = {address:to.address,privateKey:to.privateKey};
+            const walletObject_json = JSON.stringify(walletObject);
+            return el !== walletObject_json;
+            
+        });
+        const data_new = data_array_new.join("\n");
+        fs.writeFileSync(privateFile, data_new);
         console.error(`Failed to transfer ETH : ${err.message}`);
     }
 
